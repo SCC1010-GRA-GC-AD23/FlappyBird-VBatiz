@@ -12,6 +12,7 @@ let puntaje = 0
 let record = 0
 let recordAnterior = 0
 let musicaRecord
+let musicaFondo
 
 
 function preload() {
@@ -21,6 +22,7 @@ function preload() {
   imagenPersonaje = loadImage('./images/bird.png')
   imagenPared = loadImage('./images/pared.png')
   musicaRecord = loadSound('./sounds/aplauso.wav')
+  musicaFondo = loadSound('./sounds/musicafondo.mp3')
 }
 
 function setup() {
@@ -59,18 +61,20 @@ function draw() {
         record = max(puntaje, record)
       }
     
-    
       wallX[i] = wallX[i] - 5
+
+      //Revisando si el personaje ha colisionado con una pared
+      //Revisando si el personaje se sale de la pantalla
+      //o si ha colisionado con una pared
+      if (posY > height || posY < 0 || (abs(wallX[i]-300) < 60 
+          && abs(posY - wallY[i]) > 100) ) {
+        estado = 0
+        musicaFondo.stop()
+        cursor()
+      }
     }
 
     
-
-
-    //Revisando si el personaje se sale de la pantalla
-    if (posY > height || posY < 0) {
-      estado = 0
-    }
-
     if (x < -imagenFondo.width) {
       x = 0
     }
@@ -97,7 +101,6 @@ function draw() {
   }
 }
 
-
 function mousePressed() {
   if (estado === 0) {
     estado = 1
@@ -111,6 +114,31 @@ function mousePressed() {
     if (musicaRecord.isPlaying()) {
       musicaRecord.stop()
     }
+    //Loop hace que cuando acabe la musica, se vuelva a reproducir
+    musicaFondo.loop()
+    noCursor()
+
+  } else {
+    velY = -15
+  }
+}
+
+function touchStarted() {
+  if (estado === 0) {
+    estado = 1
+    x = 0
+    velY = 3
+    posY = 50
+    wallX = [600, 900]
+    wallY = [400, 600]
+    puntaje = 0
+    recordAnterior = record
+    if (musicaRecord.isPlaying()) {
+      musicaRecord.stop()
+    }
+    //Loop hace que cuando acabe la musica, se vuelva a reproducir
+    musicaFondo.loop()
+    noCursor()
 
   } else {
     velY = -15
